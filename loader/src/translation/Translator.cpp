@@ -46,26 +46,25 @@ void Translator::loadTranslations() {
 
     matjson::Value translationsObject = result.unwrap();
 
+    // Check if the parsed value is an object
     if (translationsObject.isObject()) {
-        for (auto& pair : translationsObject) {
-            // Extract key and value directly from the pair
-            std::string key;
-            if (pair.first.isString()) {
-                key = pair.first.asString().unwrap();
-            } else {
-                log::error("Invalid key type in JSON.");
-                continue;
-            }
+        // Manually iterate over the object by using .object() to get the key-value map
+        auto object = translationsObject.object();
+        for (auto it = object.begin(); it != object.end(); ++it) {
+            // Extract key as string
+            if (it->first.isString()) {
+                std::string key = it->first.asString().unwrap();
 
-            std::string value;
-            if (pair.second.isString()) {
-                value = pair.second.asString().unwrap();
+                // Extract value as string
+                if (it->second.isString()) {
+                    std::string value = it->second.asString().unwrap();
+                    translations[key] = value;
+                } else {
+                    log::error("Value for key {} is not a string.", key);
+                }
             } else {
-                log::error("Invalid value type for key {} in JSON.", key);
-                continue;
+                log::error("Key in JSON is not a string.");
             }
-
-            translations[key] = value;
         }
     } else {
         log::error("Parsed JSON is not an object.");
