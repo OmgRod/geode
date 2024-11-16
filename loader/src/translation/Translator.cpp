@@ -46,28 +46,28 @@ void Translator::loadTranslations() {
 
     matjson::Value translationsObject = result.unwrap();
 
-    if (!translationsObject.isObject()) {
+    if (translationsObject.isObject()) {
+        for (auto& pair : translationsObject) {
+            // Extract key and value directly from the pair
+            std::string key;
+            if (pair.first.isString()) {
+                key = pair.first.asString().unwrap();
+            } else {
+                log::error("Invalid key type in JSON.");
+                continue;
+            }
+
+            std::string value;
+            if (pair.second.isString()) {
+                value = pair.second.asString().unwrap();
+            } else {
+                log::error("Invalid value type for key {} in JSON.", key);
+                continue;
+            }
+
+            translations[key] = value;
+        }
+    } else {
         log::error("Parsed JSON is not an object.");
-        return;
-    }
-
-    // Directly iterate over the object using matjson's API
-    for (const auto& pair : translationsObject.asObject()) {
-        // Extract the key and value for each pair
-        auto keyResult = pair.first.asString();
-        if (!keyResult) {
-            log::error("Failed to extract key from JSON: {}", pair.first.dump());
-            continue;
-        }
-        std::string key = keyResult.unwrap();
-
-        auto valueResult = pair.second.asString();
-        if (!valueResult) {
-            log::error("Failed to extract value for key {}", key);
-            continue;
-        }
-        std::string value = valueResult.unwrap();
-
-        translations[key] = value;
     }
 }
