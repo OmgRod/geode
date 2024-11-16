@@ -50,53 +50,14 @@ void Translator::loadTranslations() {
     matjson::Value translationsObject = result.unwrap();
 
     // Populate the translations map with key-value pairs from the JSON object
-    for (auto& [key, value] : translationsObject) {
+    for (const auto& pair : translationsObject) {
+        const std::string& key = pair.first.asString().unwrap(); // Unwrap the key to get the string
+        const matjson::Value& value = pair.second; // The value is already a matjson::Value
+
         if (value.isString()) {
-            translations[key] = value.asString().unwrap();
+            translations[key] = value.asString().unwrap(); // Unwrap and insert into the map
+        } else {
+            std::cerr << "Non-string value for key: " << key << std::endl;
         }
     }
 }
-
-void Translator::saveTranslations() {
-    // Build the path to save the translations file
-    std::filesystem::path path = Mod::get()->getSaveDir() / "translations.json";
-
-    // Create a matjson object to represent the translations
-    matjson::Object translationsObject;
-    for (const auto& [key, value] : translations) {
-        translationsObject[key] = value;
-    }
-
-    // Open the file to save
-    std::ofstream file(path);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open translation file for saving: " << path << std::endl;
-        return;
-    }
-
-    // Serialize and write the translations object to file
-    matjson::write(file, translationsObject);
-    std::cout << "Translations saved to " << path << std::endl;
-}
-
-// Example of how to load/save data with `matjson`
-template<>
-struct matjson::Serialize<std::map<std::string, std::string>> {
-    static std::map<std::string, std::string> from_json(matjson::Value const& value) {
-        std::map<std::string, std::string> result;
-        for (auto& [key, val] : value.asObject()) {
-            if (val.isString()) {
-                result[key] = val.asString().unwrap();
-            }
-        }
-        return result;
-    }
-
-    static matjson::Value to_json(std::map<std::string, std::string> const& value) {
-        auto obj = matjson::Object();
-        for (const auto& [key, val] : value) {
-            obj[key] = val;
-        }
-        return obj;
-    }
-};
