@@ -51,9 +51,9 @@ void Translator::loadTranslations() {
         return;
     }
 
-    // Iterate over the JSON object
-    auto object = translationsObject.asObject();  // Convert to object
-    for (const auto& pair : object) {
+    // Directly iterate over the object
+    for (auto& pair : translationsObject) {
+        // Extract the key and value for each pair
         auto keyResult = pair.first.asString();
         if (!keyResult) {
             log::error("Failed to extract key from JSON: {}", pair.first.dump());
