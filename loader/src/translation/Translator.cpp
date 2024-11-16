@@ -51,8 +51,8 @@ void Translator::loadTranslations() {
         return;
     }
 
-    // Directly iterate over the object
-    for (auto& pair : translationsObject) {
+    // Directly iterate over the object using matjson's API
+    for (const auto& pair : translationsObject.asObject()) {
         // Extract the key and value for each pair
         auto keyResult = pair.first.asString();
         if (!keyResult) {
