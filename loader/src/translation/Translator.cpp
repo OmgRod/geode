@@ -31,7 +31,7 @@ std::string Translator::getTranslation(const std::string& translationKey) const 
 
 void Translator::loadTranslations() {
     // Build the path to the translations file
-    std::string path = Mod::get()->getResourcesDir() + "/translation/" + currentLang + ".json";
+    std::filesystem::path path = Mod::get()->getResourcesDir() / "translation" / currentLang / ".json";
 
     // Open the file
     std::ifstream file(path);
