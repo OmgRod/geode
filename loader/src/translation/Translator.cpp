@@ -46,14 +46,15 @@ void Translator::loadTranslations() {
 
     matjson::Value translationsObject = result.unwrap();
 
-    // Check if the parsed value is an object and iterate over its key-value pairs
+    // Ensure that the parsed value is an object
     if (translationsObject.isObject()) {
-        for (auto& [key, value] : translationsObject.object()) {
-            if (key.isString() && value.isString()) {
-                translations[key.asString().unwrap()] = value.asString().unwrap();
-            } else {
-                log::error("Key or value is not a string.");
-            }
+        for (auto& pair : translationsObject.object()) {
+            // Directly get the key and value, assuming they're strings
+            std::string key = pair.first.asString().unwrap();
+            std::string value = pair.second.asString().unwrap();
+
+            // Store the translation in the map
+            translations[key] = value;
         }
     } else {
         log::error("Parsed JSON is not an object.");
