@@ -1,31 +1,21 @@
-#ifndef TRANSLATOR_HPP
-#define TRANSLATOR_HPP
+#pragma once
 
 #include <string>
-#include <map>
-#include <filesystem>
+#include <unordered_map>
 #include <matjson.hpp>
 
 class Translator {
-public:
-    // Constructor that takes a language setting (0 for en-us, 1 for pt-pt)
-    Translator(int64_t languageSetting);
-
-    // Get the translated text for a given key
-    std::string getTranslation(const std::string& translationKey) const;
-
-    // Load translations from the JSON file
-    void loadTranslations();
-
-    // Save translations to a saved file
-    void saveTranslations();
-
 private:
-    // Current language setting (e.g., "en-us", "pt-pt")
+    std::unordered_map<std::string, std::string> translations;
     std::string currentLang;
 
-    // Map to hold translations (key = translation key, value = translation string)
-    std::map<std::string, std::string> translations;
-};
+    // Loads translations from the current language's JSON file
+    void loadTranslations();
 
-#endif // TRANSLATOR_HPP
+public:
+    // Constructor that sets the language based on a language setting value
+    Translator(int64_t languageSetting);
+
+    // Retrieves a translation for a given key, or a default message if not found
+    std::string getTranslation(const std::string& translationKey) const;
+};

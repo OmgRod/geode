@@ -4,6 +4,7 @@
 #include <Geode/loader/Mod.hpp>
 #include <matjson.hpp>
 #include <fstream>
+#include <filesystem>
 
 using namespace geode::prelude;
 
@@ -40,7 +41,7 @@ void Translator::loadTranslations() {
         return;
     }
 
-    // Parse the JSON file
+    // Parse the JSON file using matjson
     auto result = matjson::parse(file);
     if (!result) {
         std::cerr << "Failed to parse JSON: " << result.unwrapErr() << std::endl;
@@ -49,15 +50,31 @@ void Translator::loadTranslations() {
 
     matjson::Value translationsObject = result.unwrap();
 
-    // Populate the translations map with key-value pairs from the JSON object
-    for (const auto& pair : translationsObject) {
-        const std::string& key = pair.first.asString().unwrap(); // Unwrap the key to get the string
-        const matjson::Value& value = pair.second; // The value is already a matjson::Value
+    // Ensure we are working with an object
+    if (!translationsObject.isObject()) {
+        std::cerr << "Parsed JSON is not an object." << std::endl;
+        return;
+    }
 
-        if (value.isString()) {
-            translations[key] = value.asString().unwrap(); // Unwrap and insert into the map
-        } else {
-            std::cerr << "Non-string value for key: " << key << std::endl;
+    // Populate the translations map with key-value pairs from the JSON object
+    for (auto& pair : translationsObject) {
+        // Extract the key (should be a string)
+        auto keyResult = pair.first.asString();
+        if (!keyResult) {
+            std::cerr << "Failed to extract key from JSON: " << pair.first.dump() << std::endl;
+            continue;
         }
+        std::string key = keyResult.unwrap();
+
+        // Extract the value (should be a string)
+        auto valueResult = pair.second.asString();
+        if (!valueResult) {
+            std::cerr << "Failed to extract value for key " << key << std::endl;
+            continue;
+        }
+        std::string value = valueResult.unwrap();
+
+        // Store the translation in the map
+        translations[key] = value;
     }
 }
