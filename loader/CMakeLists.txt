@@ -84,6 +84,7 @@ file(GLOB SOURCES CONFIGURE_DEPENDS
 	src/ui/*.cpp
 	src/c++stl/*.cpp
 	hash/hash.cpp
+	src/translation/*.cpp
 )
 
 # Obj-c sources
