@@ -56,3 +56,47 @@ void Translator::loadTranslations() {
         }
     }
 }
+
+void Translator::saveTranslations() {
+    // Build the path to save the translations file
+    std::filesystem::path path = Mod::get()->getSaveDir() / "translations.json";
+
+    // Create a matjson object to represent the translations
+    matjson::Object translationsObject;
+    for (const auto& [key, value] : translations) {
+        translationsObject[key] = value;
+    }
+
+    // Open the file to save
+    std::ofstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open translation file for saving: " << path << std::endl;
+        return;
+    }
+
+    // Serialize and write the translations object to file
+    matjson::write(file, translationsObject);
+    std::cout << "Translations saved to " << path << std::endl;
+}
+
+// Example of how to load/save data with `matjson`
+template<>
+struct matjson::Serialize<std::map<std::string, std::string>> {
+    static std::map<std::string, std::string> from_json(matjson::Value const& value) {
+        std::map<std::string, std::string> result;
+        for (auto& [key, val] : value.asObject()) {
+            if (val.isString()) {
+                result[key] = val.asString().unwrap();
+            }
+        }
+        return result;
+    }
+
+    static matjson::Value to_json(std::map<std::string, std::string> const& value) {
+        auto obj = matjson::Object();
+        for (const auto& [key, val] : value) {
+            obj[key] = val;
+        }
+        return obj;
+    }
+};
