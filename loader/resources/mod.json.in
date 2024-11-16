@@ -79,7 +79,7 @@
             "min": 0,
             "max": 1,
             "name": "Language",
-            "description": "Languages:\n\n0 - English\n1 - Portuguese"
+            "description": "0 - English\n1 - Portuguese"
         },
         "disable-last-crashed-popup": {
             "type": "bool",
