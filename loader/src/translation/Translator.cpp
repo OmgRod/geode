@@ -28,35 +28,41 @@ std::string Translator::getTranslation(const std::string& translationKey) const 
     return "Translation not found";
 }
 
-void Translator::loadTranslations() {
+Result<void, std::string> Translator::loadTranslations() {
     std::filesystem::path path = Mod::get()->getResourcesDir() / "translation" / currentLang / "translations.json";
 
     std::ifstream file(path);
     if (!file.is_open()) {
-        log::error("Failed to open translation file: {}", path);
-        return;
+        return Err("Failed to open translation file: " + path.string());
     }
 
     std::string fileContents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     auto result = matjson::parse(fileContents);
     if (!result) {
-        log::error("Failed to parse JSON: {}", result.unwrapErr());
-        return;
+        return Err("Failed to parse JSON: " + result.unwrapErr());
     }
 
     matjson::Value translationsObject = result.unwrap();
 
-    // Ensure that the parsed value is an object
-    if (translationsObject.isObject()) {
-        for (auto& pair : translationsObject.object()) {
-            // Directly get the key and value, assuming they're strings
-            std::string key = pair.first.asString().unwrap();
-            std::string value = pair.second.asString().unwrap();
-
-            // Store the translation in the map
-            translations[key] = value;
-        }
-    } else {
-        log::error("Parsed JSON is not an object.");
+    // Check if the parsed JSON is an object
+    if (!translationsObject.isObject()) {
+        return Err("Parsed JSON is not an object, got: " + jsonTypeToString(translationsObject.type()));
     }
+
+    // Iterate manually over key-value pairs
+    for (auto& keyValuePair : translationsObject.asObject()) {
+        if (keyValuePair.first.isString()) {
+            std::string key = keyValuePair.first.asString().unwrap();
+            if (keyValuePair.second.isString()) {
+                std::string value = keyValuePair.second.asString().unwrap();
+                translations[key] = value;
+            } else {
+                return Err("Value for key \"" + key + "\" is not a string.");
+            }
+        } else {
+            return Err("Key in JSON is not a string.");
+        }
+    }
+
+    return Ok();
 }
