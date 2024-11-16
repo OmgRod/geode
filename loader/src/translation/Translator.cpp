@@ -1,5 +1,4 @@
 #include "Translator.hpp"
-#include <stdexcept>
 #include <iostream>
 #include <Geode/Geode.hpp>
 #include <Geode/loader/Mod.hpp>
@@ -22,20 +21,12 @@ Translator::Translator(int64_t languageSetting) {
     loadTranslations();
 }
 
-std::string Translator::getLang() const {
-    return currentLang;
-}
-
 std::string Translator::getTranslation(const std::string& translationKey) const {
     auto it = translations.find(translationKey);
     if (it != translations.end()) {
         return it->second;
     }
     return "Translation not found";  // Return a default message if the key is not found
-}
-
-void Translator::addTranslation(const std::string& key, const std::string& translation) {
-    translations[key] = translation;
 }
 
 void Translator::loadTranslations() {

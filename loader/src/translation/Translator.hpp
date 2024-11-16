@@ -10,14 +10,8 @@ public:
     // Constructor that initializes the language and loads translations
     Translator(int64_t languageSetting);
 
-    // Gets the current language
-    std::string getLang() const;
-
     // Retrieves the translation for a given key
     std::string getTranslation(const std::string& translationKey) const;
-
-    // Optionally, a function to add new translations dynamically
-    void addTranslation(const std::string& key, const std::string& translation);
 
 private:
     std::string currentLang;  // Current language (e.g., "en-us", "pt-pt")
