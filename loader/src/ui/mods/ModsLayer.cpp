@@ -481,23 +481,41 @@ bool ModsLayer::init() {
     mainTabs->setTouchPriority(-150);
 
     for (auto item : std::initializer_list<std::tuple<const char*, const char*, ModListSource*, const char*, bool>> {
-        { "download.png"_spr, translation.getTranslation("geode.mods.installedTab").c_str(), InstalledModListSource::get(InstalledModListType::All), "installed-button", false },
-        { "GJ_starsIcon_001.png", translation.getTranslation("geode.mods.featuredTab").c_str(), ServerModListSource::get(ServerModListType::Featured), "featured-button", false },
-        { "globe.png"_spr, translation.getTranslation("geode.mods.downloadTab").c_str(), ServerModListSource::get(ServerModListType::Download), "download-button", false },
-        { "GJ_timeIcon_001.png", translation.getTranslation("geode.mods.recentTab").c_str(), ServerModListSource::get(ServerModListType::Recent), "recent-button", false },
-        { "d_artCloud_03_001.png", translation.getTranslation("geode.mods.modtoberTab").c_str(), ServerModListSource::get(ServerModListType::Modtober24), "modtober-button", true },
-    }) {
-        auto tab = GeodeTabSprite::create(std::get<0>(item), std::get<1>(item), 100, std::get<4>(item));
+        // Fetch the translation for the tab label text
+        const char* tabText = translation.getTranslation(std::get<1>(item)).c_str();
 
+        // Log the translation value to check if it's valid
+        log::debug("Translation for {}: {}", std::get<1>(item), tabText);
+
+        // Check if the translation is valid, if not, use the fallback (the key itself)
+        if (tabText == nullptr || tabText[0] == '\0') {
+            tabText = std::get<1>(item);  // Use the key itself as fallback
+            log::debug("Translation missing for {}. Using fallback: {}", std::get<1>(item), tabText);
+        }
+
+        // Debug the image path
+        const char* imagePath = std::get<0>(item);
+        log::debug("Image path for tab: {}", imagePath);
+
+        // Create the tab sprite with the translation text
+        auto tab = GeodeTabSprite::create(imagePath, tabText, 100, std::get<4>(item));
+
+        // Create the button associated with this tab
         auto btn = CCMenuItemSpriteExtra::create(
             tab,
             this, menu_selector(ModsLayer::onTab)
         );
         btn->setUserData(std::get<2>(item));
         btn->setID(std::get<3>(item));
-        tab->setLabelText(std::get<1>(item));
-        log::debug("Tab name: {}", std::get<1>(item));
+
+        // Set the label text on the tab sprite
+        tab->setLabelText(tabText);
+        log::debug("Tab name: {}", tabText);  // Log the label text to ensure it's set correctly
+
+        // Add the button to the main tabs container
         mainTabs->addChild(btn);
+
+        // Keep track of the created buttons
         m_tabs.push_back(btn);
     }
 
