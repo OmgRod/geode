@@ -480,26 +480,29 @@ bool ModsLayer::init() {
     // Increment touch priority so the mods in the list don't override
     mainTabs->setTouchPriority(-150);
 
-    for (auto item : std::initializer_list<std::tuple<const char*, const char*, ModListSource*, const char*, bool>> {
-        { "download.png"_spr, translation.getTranslation("geode.mods.installedTab").c_str(), InstalledModListSource::get(InstalledModListType::All), "installed-button", false },
-        { "GJ_starsIcon_001.png", translation.getTranslation("geode.mods.featuredTab").c_str(), ServerModListSource::get(ServerModListType::Featured), "featured-button", false },
-        { "globe.png"_spr, translation.getTranslation("geode.mods.downloadTab").c_str(), ServerModListSource::get(ServerModListType::Download), "download-button", false },
-        { "GJ_timeIcon_001.png", translation.getTranslation("geode.mods.recentTab").c_str(), ServerModListSource::get(ServerModListType::Recent), "recent-button", false },
-        { "d_artCloud_03_001.png", translation.getTranslation("geode.mods.modtoberTab").c_str(), ServerModListSource::get(ServerModListType::Modtober24), "modtober-button", true },
+    for (auto item : std::initializer_list<std::tuple<std::string, std::string, ModListSource*, std::string, bool>> {
+        { "download.png"_spr, translation.getTranslation("geode.mods.installedTab"), InstalledModListSource::get(InstalledModListType::All), "installed-button", false },
+        { "GJ_starsIcon_001.png", translation.getTranslation("geode.mods.featuredTab"), ServerModListSource::get(ServerModListType::Featured), "featured-button", false },
+        { "globe.png"_spr, translation.getTranslation("geode.mods.downloadTab"), ServerModListSource::get(ServerModListType::Download), "download-button", false },
+        { "GJ_timeIcon_001.png", translation.getTranslation("geode.mods.recentTab"), ServerModListSource::get(ServerModListType::Recent), "recent-button", false },
+        { "d_artCloud_03_001.png", translation.getTranslation("geode.mods.modtoberTab"), ServerModListSource::get(ServerModListType::Modtober24), "modtober-button", true },
     }) {
-        // Convert the char* to std::string
-        std::string tabText = std::get<1>(item); // std::get<1>(item) is const char*
+        // Fetch the translation using std::string
+        std::string tabText = std::get<1>(item);
 
-        // Debug log to check translation
-        log::debug("Fetched translation for tab '{}': {}", std::get<1>(item), tabText);
-
-        // Create the tab sprite with the std::string version of the text
-        auto tab = GeodeTabSprite::create(std::get<0>(item), tabText.c_str(), 100, std::get<4>(item));
-
-        if (!tab) {
-            log::error("Failed to create tab sprite for '{}'", tabText);  // Check sprite creation
+        // Handle empty or corrupted translations
+        if (tabText.empty()) {
+            log::error("Empty translation for tab '{}', using fallback text.", std::get<1>(item));
+            tabText = "Unknown Tab";  // Fallback text
         }
 
+        // Log to ensure translation is fetched correctly
+        log::debug("Fetched translation for tab '{}': {}", std::get<1>(item), tabText);
+
+        // Create the tab sprite
+        auto tab = GeodeTabSprite::create(std::get<0>(item), tabText, 100, std::get<4>(item));
+
+        // Create the button associated with this tab
         auto btn = CCMenuItemSpriteExtra::create(
             tab,
             this, menu_selector(ModsLayer::onTab)
@@ -507,16 +510,16 @@ bool ModsLayer::init() {
         btn->setUserData(std::get<2>(item));
         btn->setID(std::get<3>(item));
 
-        // Set the label text on the tab sprite using the C-string version of the std::string
-        tab->setLabelText(tabText.c_str());
+        // Set the label text for the tab sprite
+        tab->setLabelText(tabText);
 
-        // Log for debugging
+        // Log the label text to ensure it's set correctly
         log::debug("Set label text for tab '{}'", tabText);
 
         // Add the button to the main tabs container
         mainTabs->addChild(btn);
 
-        // Keep track of the created buttons
+        // Track the created buttons
         m_tabs.push_back(btn);
     }
 
