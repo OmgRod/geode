@@ -499,8 +499,8 @@ bool ModsLayer::init() {
         // Log to ensure translation is fetched correctly
         log::debug("Fetched translation for tab '{}': {}", std::get<1>(item), tabText);
 
-        // Create the tab sprite
-        auto tab = GeodeTabSprite::create(std::get<0>(item), tabText, 100, std::get<4>(item));
+        // Use std::string but convert to const char* when calling create
+        auto tab = GeodeTabSprite::create(std::get<0>(item).c_str(), tabText.c_str(), 100, std::get<4>(item));
 
         // Create the button associated with this tab
         auto btn = CCMenuItemSpriteExtra::create(
@@ -510,8 +510,8 @@ bool ModsLayer::init() {
         btn->setUserData(std::get<2>(item));
         btn->setID(std::get<3>(item));
 
-        // Set the label text for the tab sprite
-        tab->setLabelText(tabText);
+        // Set the label text with std::string by converting only here
+        tab->setLabelText(tabText.c_str());  // Explicitly convert to const char*
 
         // Log the label text to ensure it's set correctly
         log::debug("Set label text for tab '{}'", tabText);
