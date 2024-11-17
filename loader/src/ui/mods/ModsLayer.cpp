@@ -495,7 +495,7 @@ bool ModsLayer::init() {
         );
         btn->setUserData(std::get<2>(item));
         btn->setID(std::get<3>(item));
-        tab->m_label->setString(std::get<1>(item));
+        tab->setLabelText(std::get<1>(item));
         mainTabs->addChild(btn);
         m_tabs.push_back(btn);
     }

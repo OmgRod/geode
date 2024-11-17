@@ -107,4 +107,11 @@ public:
 
     void select(bool selected);
     void disable(bool disabled);
+
+    // Public method to update the label text
+    void setLabelText(const char* text) {
+        if (m_label) {
+            m_label->setString(text);
+        }
+    }
 };
