@@ -1,10 +1,9 @@
 #include "Translator.hpp"
-#include <Geode/Geode.hpp> // For Mod::get()->getSettingValue
+#include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
 
 Translator::Translator() {
-    // Default to English if no language is specified
     currentLang = "en-us";
     loadTranslations();
 }
@@ -12,21 +11,20 @@ Translator::Translator() {
 void Translator::setLanguage(int64_t languageSetting) {
     switch (languageSetting) {
         case 0:
-            currentLang = "en-us";  // English
+            currentLang = "en-us";
             break;
         case 1:
-            currentLang = "pt-pt";  // Portuguese
+            currentLang = "pt-pt";
             break;
         default:
-            currentLang = "en-us";  // Default to English if an unrecognized setting is passed
+            currentLang = "en-us";
             break;
     }
 
-    loadTranslations();  // Load translations after changing language
+    loadTranslations();
 }
 
 void Translator::loadTranslations() {
-    // Populate the translations table for English and Portuguese
     translations = {
         {"en-us", {
             {"geode.mods.installedTab", "Installed"},
@@ -46,14 +44,14 @@ void Translator::loadTranslations() {
 }
 
 std::string Translator::getTranslation(const std::string& translationKey) const {
-    auto langIt = translations.find(currentLang);  // Find the correct language
+    auto langIt = translations.find(currentLang);
     if (langIt != translations.end()) {
         const auto& langTranslations = langIt->second;
         auto keyIt = langTranslations.find(translationKey);
         if (keyIt != langTranslations.end()) {
-            return keyIt->second;  // Return the translation if found
+            return keyIt->second;
         }
     }
 
-    return "[Missing translation: " + translationKey + "]";  // Return a placeholder if the key isn't found
+    return "[Missing translation: " + translationKey + "]";
 }

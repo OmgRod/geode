@@ -6,15 +6,15 @@
 
 class Translator {
 private:
-    std::string currentLang; // Holds the current language code
+    std::string currentLang;
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
 
-    void loadTranslations(); // Loads translations into the map
+    void loadTranslations();
 
 public:
-    Translator(); // Default constructor
-    void setLanguage(int64_t languageSetting); // Setter to change the language dynamically
+    Translator();
+    void setLanguage(int64_t languageSetting);
     std::string getTranslation(const std::string& translationKey) const;
 };
 
-#endif // TRANSLATOR_HPP
+#endif
