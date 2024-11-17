@@ -500,8 +500,8 @@ bool ModsLayer::init() {
         btn->setUserData(std::get<2>(item));
         btn->setID(std::get<3>(item));
 
-        // Set the label text on the tab sprite using the std::string
-        tab->setLabelText(tabText);
+        // Set the label text on the tab sprite using the C-string version of the std::string
+        tab->setLabelText(tabText.c_str());
 
         // Log the tab name
         log::debug("Tab name: {}", tabText);
