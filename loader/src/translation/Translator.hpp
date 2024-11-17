@@ -2,18 +2,16 @@
 
 #include <string>
 #include <unordered_map>
-#include <Geode/Result.hpp>
-#include <matjson.hpp>
 
 class Translator {
 private:
-    std::unordered_map<std::string, std::string> translations; // Translation key-value pairs
-    std::string currentLang; // Current language code (e.g., "en", "fr", etc.)
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
+    std::string currentLang;
 
-    Result<void, std::string> loadTranslations(); // Load translations from a file or source
+    void loadTranslations();
 
 public:
-    Translator(int64_t languageSetting); // Constructor for setting the language
+    Translator(int64_t languageSetting);
 
-    std::string getTranslation(const std::string& translationKey) const; // Fetch a translation
+    std::string getTranslation(const std::string& translationKey) const;
 };
