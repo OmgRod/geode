@@ -1,68 +1,68 @@
 #include "Translator.hpp"
-#include <iostream>
-#include <Geode/Geode.hpp>
-#include <Geode/loader/Mod.hpp>
-#include <matjson.hpp>
-#include <fstream>
-#include <filesystem>
+#include "Geode/utils/JsonValidation.hpp" // JSON validation utilities
 
-using namespace geode::prelude;
-
+// Constructor that sets the current language
 Translator::Translator(int64_t languageSetting) {
-    if (languageSetting == 0) {
-        currentLang = "en-us";
-    } else if (languageSetting == 1) {
-        currentLang = "pt-pt";
-    } else {
-        currentLang = "en-us";
+    // Map language setting to language code (example: 0 = "en", 1 = "fr")
+    switch (languageSetting) {
+        case 0:
+            currentLang = "en";
+            break;
+        case 1:
+            currentLang = "fr";
+            break;
+        default:
+            currentLang = "en"; // Default to English
+            break;
     }
 
-    loadTranslations();
-}
-
-std::string Translator::getTranslation(const std::string& translationKey) const {
-    auto it = translations.find(translationKey);
-    if (it != translations.end()) {
-        return it->second;
-    }
-    return "Translation not found";
-}
-
-Result<void, std::string> Translator::loadTranslations() {
-    std::filesystem::path path = Mod::get()->getResourcesDir() / "translation" / currentLang / "translations.json";
-
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        return Err("Failed to open translation file: " + path.string());
-    }
-
-    std::string fileContents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    auto result = matjson::parse(fileContents);
+    // Load translations for the selected language
+    auto result = loadTranslations();
     if (!result) {
-        return Err("Failed to parse JSON: " + result.unwrapErr());
+        // Handle errors during loading, log or handle appropriately
+        throw std::runtime_error("Failed to load translations: " + result.unwrapErr());
+    }
+}
+
+// Load translations from a JSON file or another source
+Result<void, std::string> Translator::loadTranslations() {
+    std::string fileName = "translations_" + currentLang + ".json";
+
+    auto result = matjson::parseFromFile(fileName);
+    if (!result) {
+        return Err(std::string("Failed to parse JSON: ") + result.unwrapErr().toString());
     }
 
-    matjson::Value translationsObject = result.unwrap();
-
-    // Check if the parsed JSON is an object
+    auto& translationsObject = result.unwrap();
     if (!translationsObject.isObject()) {
-        return Err("Parsed JSON is not an object, got: " + jsonTypeToString(translationsObject.type()));
+        return Err(std::string("Parsed JSON is not an object, got: ") +
+                   jsonValueTypeToString(translationsObject.type()));
     }
 
-    // Iterate manually over key-value pairs
-    for (auto& keyValuePair : translationsObject.asObject()) {
-        if (keyValuePair.first.isString()) {
-            std::string key = keyValuePair.first.asString().unwrap();
-            if (keyValuePair.second.isString()) {
-                std::string value = keyValuePair.second.asString().unwrap();
-                translations[key] = value;
-            } else {
-                return Err("Value for key \"" + key + "\" is not a string.");
-            }
-        } else {
-            return Err("Key in JSON is not a string.");
+    auto& obj = translationsObject.getObject(); // Assuming `getObject()` provides a map
+    for (const auto& keyValuePair : obj) {
+        const auto& key = keyValuePair.first;
+        const auto& value = keyValuePair.second;
+
+        if (!value.isString()) {
+            return Err(std::string("Expected translation for key '") + key +
+                       "' to be a string, got: " +
+                       jsonValueTypeToString(value.type()));
         }
+
+        translations[key] = value.asString(); // Store the key-value pair
     }
 
     return Ok();
+}
+
+// Fetch a translation by key
+std::string Translator::getTranslation(const std::string& translationKey) const {
+    auto it = translations.find(translationKey);
+    if (it != translations.end()) {
+        return it->second; // Return the translation if found
+    }
+
+    // Return a placeholder or log missing key
+    return "[Missing translation: " + translationKey + "]";
 }
