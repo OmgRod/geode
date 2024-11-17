@@ -20,7 +20,7 @@
 #include <loader/LoaderImpl.hpp>
 #include "../../translation/Translator.hpp"
 
-Translator translation(1);
+Translator translation;
 
 bool ModsStatusNode::init() {
     if (!CCNode::init())
