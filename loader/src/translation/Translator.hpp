@@ -11,7 +11,7 @@ private:
     void loadTranslations();
 
 public:
-    Translator(int64_t languageSetting);
+    Translator();
 
     std::string getTranslation(const std::string& translationKey) const;
 };

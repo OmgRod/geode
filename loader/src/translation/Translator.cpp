@@ -1,7 +1,13 @@
 #include "Translator.hpp"
+#include <Geode/Geode.hpp>
 
-Translator::Translator(int64_t languageSetting) {
-    // Map language setting to language code
+using namespace geode::prelude;
+
+Translator::Translator() {
+    // Retrieve the language setting from Geode's settings
+    auto languageSetting = Mod::get()->getSettingValue<int64_t>("language");
+
+    // Map the setting value to the language code
     switch (languageSetting) {
         case 0:
             currentLang = "en-us";
