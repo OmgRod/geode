@@ -1,3 +1,4 @@
+// Translator.hpp
 #ifndef TRANSLATOR_HPP
 #define TRANSLATOR_HPP
 
@@ -5,16 +6,24 @@
 #include <unordered_map>
 
 class Translator {
-private:
-    std::string currentLang;
-    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
-
-    void loadTranslations();
-
 public:
     Translator();
+
+    // Set the language based on a setting
     void setLanguage(int64_t languageSetting);
+
+    // Get the translation for a specific key
     std::string getTranslation(const std::string& translationKey) const;
+
+private:
+    // Current language (en-us or pt-pt)
+    std::string currentLang;
+
+    // The map of translations for different languages
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
+
+    // Load translations for all supported languages
+    void loadTranslations();
 };
 
-#endif
+#endif // TRANSLATOR_HPP

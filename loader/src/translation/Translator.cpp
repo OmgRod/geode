@@ -1,10 +1,11 @@
+// Translator.cpp
 #include "Translator.hpp"
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
 
 Translator::Translator() {
-    currentLang = "en-us";
+    currentLang = "en-us";  // Default to English
     loadTranslations();
 }
 
@@ -45,7 +46,7 @@ void Translator::loadTranslations() {
         }}
     };
 
-    // Log translations to verify
+    // Log translations loaded for current language
     log::debug("Translations loaded for language: {}", currentLang);
     for (const auto& [key, value] : translations[currentLang]) {
         log::debug("Loaded translation: {} -> {}", key, value);
@@ -53,14 +54,18 @@ void Translator::loadTranslations() {
 }
 
 std::string Translator::getTranslation(const std::string& translationKey) const {
+    // Ensure that the translation map is checked based on the current language
     auto langIt = translations.find(currentLang);
     if (langIt != translations.end()) {
         const auto& langTranslations = langIt->second;
         auto keyIt = langTranslations.find(translationKey);
         if (keyIt != langTranslations.end()) {
-            return keyIt->second;
+            log::debug("Fetched translation for key '{}': {}", translationKey, keyIt->second);
+            return keyIt->second;  // Return the translation for the current language
         }
     }
 
+    // If not found, return the key as a fallback
+    log::debug("Translation not found for key '{}', returning key as fallback", translationKey);
     return "[Missing translation: " + translationKey + "]";
 }
