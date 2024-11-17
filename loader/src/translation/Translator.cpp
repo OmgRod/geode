@@ -9,41 +9,24 @@ Translator::Translator() {
     loadTranslations();
 }
 
-Translator::Translator(int64_t languageSetting) {
-    // Map language setting to language code
-    switch (languageSetting) {
-        case 0:
-            currentLang = "en-us";
-            break;
-        case 1:
-            currentLang = "pt-pt";
-            break;
-        default:
-            currentLang = "en-us";
-            break;
-    }
-
-    loadTranslations();
-}
-
 void Translator::setLanguage(int64_t languageSetting) {
     switch (languageSetting) {
         case 0:
-            currentLang = "en-us";
+            currentLang = "en-us";  // English
             break;
         case 1:
-            currentLang = "pt-pt";
+            currentLang = "pt-pt";  // Portuguese
             break;
         default:
-            currentLang = "en-us";
+            currentLang = "en-us";  // Default to English if an unrecognized setting is passed
             break;
     }
 
-    loadTranslations();
+    loadTranslations();  // Load translations after changing language
 }
 
 void Translator::loadTranslations() {
-    // Populate the translations table
+    // Populate the translations table for English and Portuguese
     translations = {
         {"en-us", {
             {"geode.mods.installedTab", "Installed"},
@@ -63,14 +46,14 @@ void Translator::loadTranslations() {
 }
 
 std::string Translator::getTranslation(const std::string& translationKey) const {
-    auto langIt = translations.find(currentLang);
+    auto langIt = translations.find(currentLang);  // Find the correct language
     if (langIt != translations.end()) {
         const auto& langTranslations = langIt->second;
         auto keyIt = langTranslations.find(translationKey);
         if (keyIt != langTranslations.end()) {
-            return keyIt->second;
+            return keyIt->second;  // Return the translation if found
         }
     }
 
-    return "[Missing translation: " + translationKey + "]";
+    return "[Missing translation: " + translationKey + "]";  // Return a placeholder if the key isn't found
 }

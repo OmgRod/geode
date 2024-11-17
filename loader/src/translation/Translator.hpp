@@ -13,9 +13,7 @@ private:
 
 public:
     Translator(); // Default constructor
-    Translator(int64_t languageSetting); // Constructor with language setting
-
-    void setLanguage(int64_t languageSetting); // Optional setter for language
+    void setLanguage(int64_t languageSetting); // Setter to change the language dynamically
     std::string getTranslation(const std::string& translationKey) const;
 };
 
